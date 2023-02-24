@@ -66,10 +66,11 @@ export default class WorkerLogger {
     const line: LogLine = {
       level,
       message,
-      meta: {
+      // Make it undefined instead of an empty object
+      meta: this.opts.withMeta || meta ? {
         ...this.opts.withMeta,
         ...meta
-      }
+      } : undefined
     }
     if (this.opts.timestampFunc) {
       if (!line.meta) {
