@@ -37,6 +37,11 @@ export interface WorkerLoggerOptions {
    * Optional object to join with each `log.meta`. Will be overwritten by an individual log's `.meta` properties.
    */
   withMeta?: { [key: string]: any }
+  /**
+   * They key to use for the log level. Default `level`.
+   * If not `level` then `LogLine.level` will be `undefined.
+   */
+  levelKey?: string
 }
 
 export interface LogMeta {
@@ -47,7 +52,11 @@ export interface LogMeta {
 export interface LogLine {
   message: string
   meta?: LogMeta
-  level: LogLevel
+  /**
+   * Default log level, exists if the `levelKey` is not overridden.
+   */
+  level?: LogLevel
+  [key: string]: any
 }
 
 export default class WorkerLogger {
@@ -64,7 +73,7 @@ export default class WorkerLogger {
       return
     }
     const line: LogLine = {
-      level,
+      [this.opts.levelKey || "level"]: level,
       message,
       // Make it undefined instead of an empty object
       meta: this.opts.withMeta || meta ? {
