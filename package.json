@@ -3,7 +3,7 @@
     "@types/node": "^18.14.1",
     "typescript": "^4.9.5"
   },
-  "name": "workerslogger",
+  "name": "cfworkerslogger",
   "description": "An optimized logger for Cloudflare Workers.",
   "version": "0.0.1",
   "main": "index.js",
