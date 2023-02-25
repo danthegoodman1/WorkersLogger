@@ -98,16 +98,16 @@ export default class WorkerLogger {
     }
     switch (level) {
       case "DEBUG":
-        console.debug(logContent)
+        console.debug(...logContent)
         break
       case "INFO":
-        console.info(logContent)
+        console.info(...logContent)
         break
       case "WARN":
-        console.warn(logContent)
+        console.warn(...logContent)
         break
       case "ERROR":
-        console.error(logContent)
+        console.error(...logContent)
         break
     }
   }
