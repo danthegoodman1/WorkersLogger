@@ -67,6 +67,4 @@ You may optionally provide a destination function that will bulk-write to a sink
 
 ### Usage
 
-```js
-
-```
+See [/examples](/examples)
