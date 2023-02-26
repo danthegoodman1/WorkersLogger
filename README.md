@@ -67,7 +67,7 @@ Durable objects will keep running until all promises have settled. So you can do
 
 ```ts
 async fetch() {
-  ...
+  // ... your code
   const res = new Response("wrote events to schema")
   logger.Drain() // DO will wait until all promises have resolved
   return res
