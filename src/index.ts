@@ -60,36 +60,36 @@ export interface LogLine {
 }
 
 export default class WorkerLogger {
-  opts: WorkerLoggerOptions
+  opts?: WorkerLoggerOptions
   logLines: LogLine[] = []
 
-  constructor(options: WorkerLoggerOptions) {
+  constructor(options?: WorkerLoggerOptions) {
     this.opts = options
   }
 
   writeLog(level: LogLevel, message: string, meta?: LogMeta) {
     // Check log level - yes there is probably a better way to do this shut up
-    if (logLevels.indexOf(level) < logLevels.indexOf(this.opts.level || "INFO")) {
+    if (logLevels.indexOf(level) < logLevels.indexOf(this.opts?.level || "INFO")) {
       return
     }
     const line: LogLine = {
-      [this.opts.levelKey || "level"]: level,
+      [this.opts?.levelKey || "level"]: level,
       message,
       // Make it undefined instead of an empty object
-      meta: this.opts.withMeta || meta ? {
-        ...this.opts.withMeta,
+      meta: this.opts?.withMeta || meta ? {
+        ...this.opts?.withMeta,
         ...meta
       } : undefined
     }
-    if (this.opts.timestampFunc) {
+    if (this.opts?.timestampFunc) {
       if (!line.meta) {
         line.meta = {}
       }
-      line.meta[this.opts.timestampKey || "_time"] = this.opts.timestampFunc()
+      line.meta[this.opts?.timestampKey || "_time"] = this.opts?.timestampFunc()
     }
 
     this.logLines.push(line)
-    if (this.opts.disableConsole) {
+    if (this.opts?.disableConsole) {
       return
     }
     const logContent: any[] = [level, message]
@@ -129,10 +129,10 @@ export default class WorkerLogger {
   }
 
   async Drain() {
-    if (!this.opts.destinationFunction) {
+    if (!this.opts?.destinationFunction) {
       return
     }
 
-    return this.opts.destinationFunction(this.logLines)
+    return this.opts?.destinationFunction(this.logLines)
   }
 }
