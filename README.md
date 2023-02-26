@@ -61,6 +61,19 @@ logger.info("this will overwrite", {
 // ["INFO", "this will overwrite", "AThing", "c"]
 ```
 
+### With Durable Objects
+
+Durable objects will keep running until all promises have settled. So you can do something like:
+
+```ts
+async fetch() {
+  ...
+  const res = new Response("wrote events to schema")
+  logger.Drain() // DO will wait until all promises have resolved
+  return res
+}
+```
+
 ## Destination Function
 
 You may optionally provide a destination function that will bulk-write to a sink. Combined with `(event|ctx).waitUntil()` you can have this run after the response is written.
