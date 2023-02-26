@@ -8,7 +8,9 @@ Used in production at [Tangia](www.tangia.co).
 
 ## Install
 
-`npm i cfworkerslogger`
+```
+npm i cfworkerslogger
+```
 
 ## Console Logging
 
