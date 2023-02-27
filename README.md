@@ -4,7 +4,7 @@ An optimized logger for Cloudflare Workers.
 
 This allows you to capture full logs in cloudflare workers (no 150 char line limit) without slowing down your workers or having to setup a HTTP worker for HTTP logpush jobs (to proxy because of their test request).
 
-Used in production at [Tangia](www.tangia.co).
+Used in production at [Tangia](https://www.tangia.co).
 
 ## Install
 
