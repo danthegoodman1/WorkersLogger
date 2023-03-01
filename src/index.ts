@@ -42,6 +42,10 @@ export interface WorkerLoggerOptions {
    * If not `level` then `LogLine.level` will be `undefined.
    */
   levelKey?: string
+  /**
+   * Whether to include the `withMeta` items in the console, default `false`.
+   */
+  metaInConsole?: boolean
 }
 
 export interface LogMeta {
@@ -96,6 +100,10 @@ export default class WorkerLogger {
     if (meta) {
       logContent.push(...Array.from(Object.entries(meta)).reduce((agg, pair) => [...agg, ...pair] as any))
     }
+    if (this.opts?.withMeta && this.opts?.metaInConsole) {
+      logContent.push(...Array.from(Object.entries(this.opts.withMeta)).reduce((agg, pair) => [...agg, ...pair] as any))
+    }
+
     switch (level) {
       case "DEBUG":
         console.debug(...logContent)
