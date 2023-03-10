@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/danthegoodman1/WorkersLogger/issues"
   },
-  "homepage": "https://github.com/danthegoodman1/WorkersLogger#readme"
+  "homepage": "https://github.com/danthegoodman1/WorkersLogger#readme",
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20230307.0"
+  }
 }

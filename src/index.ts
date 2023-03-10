@@ -1,3 +1,5 @@
+import { Request, Response } from "@cloudflare/workers-types"
+
 export type LogLevel = "DEBUG" | "INFO" | "WARN" | "ERROR"
 const logLevels = ["DEBUG", "INFO", "WARN", "ERROR"]
 
@@ -32,7 +34,7 @@ export interface WorkerLoggerOptions {
    * Only provides the log lines >= the current log level.
    * e.g. `TRACE` logs will be suppressed for level `DEBUG` and above.
    */
-  destinationFunction?(lines: LogLine[]): Promise<void>
+  destinationFunction?(lines: LogLine[], httpLog?: HTTPLog): Promise<void>
   /**
    * Optional object to join with each `log.meta`. Will be overwritten by an individual log's `.meta` properties.
    */
@@ -63,9 +65,23 @@ export interface LogLine {
   [key: string]: any
 }
 
+export interface HTTPLog {
+  response: {
+    statusCode: number
+  }
+  request: {
+    method: string
+    headers: {
+      [key: string]: any
+    }
+    url: string
+  }
+}
+
 export default class WorkerLogger {
   opts?: WorkerLoggerOptions
   logLines: LogLine[] = []
+  httpLog?: HTTPLog
 
   constructor(options?: WorkerLoggerOptions) {
     this.opts = options
@@ -136,11 +152,29 @@ export default class WorkerLogger {
     this.writeLog("ERROR", message, meta)
   }
 
+  logHTTP(request: Request, response: Response) {
+    this.httpLog = {
+      request: {
+        headers: Object.fromEntries(Array.from(request.headers.entries()).map(([key, val]) => {
+          if (key.toLowerCase() === "authorization") {
+            val = "REDACTED"
+          }
+          return [key, val]
+        })),
+        method: request.method,
+        url: request.url,
+      },
+      response: {
+        statusCode: response.status
+      }
+    }
+  }
+
   async Drain() {
     if (!this.opts?.destinationFunction) {
       return
     }
 
-    return this.opts?.destinationFunction(this.logLines)
+    return this.opts?.destinationFunction(this.logLines, this.httpLog)
   }
 }
