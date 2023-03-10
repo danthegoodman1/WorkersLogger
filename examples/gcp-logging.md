@@ -9,17 +9,15 @@ const logger = new WorkerLogger({
   level: "DEBUG",
   levelKey: "severity",
   withMeta: {
-    url: request.url,
-    headers: request.headers,
-    method: request.method
+    rayID: request.headers.get("cf-ray")
   },
-  destinationFunction: async function (lines) {
-    const serviceAccount = JSON.parse(env.SERVICE_ACCT) as ServiceAccount
+  destinationFunction: (lines, httpLog) => {
+    const sa = JSON.parse(env.ServiceAccount) as ServiceAccount
 
     const pemHeader = "-----BEGIN PRIVATE KEY-----"
     const pemFooter = "-----END PRIVATE KEY-----"
 
-    const pem = serviceAccount.private_key.replace(/\n/g, "")
+    const pem = sa.private_key.replace(/\n/g, "")
     if (!pem.startsWith(pemHeader) || !pem.endsWith(pemFooter)) {
       throw new Error("Invalid service account private key")
     }
@@ -50,7 +48,7 @@ const logger = new WorkerLogger({
       JSON.stringify({
         alg: "RS256",
         typ: "JWT",
-        kid: serviceAccount.private_key_id,
+        kid: sa.private_key_id,
       })
     )
 
@@ -59,8 +57,8 @@ const logger = new WorkerLogger({
 
     const payload = Base64.encodeURI(
       JSON.stringify({
-        iss: serviceAccount.client_email,
-        sub: serviceAccount.client_email,
+        iss: sa.client_email,
+        sub: sa.client_email,
         aud: "https://logging.googleapis.com/",
         exp,
         iat,
@@ -83,7 +81,44 @@ const logger = new WorkerLogger({
 
     const token = `${header}.${payload}.${signature}`
 
-    const res = await RetryableFetch(
+    const entries: any[] = []
+    for (const log of logLines) {
+      entries.push(...log.Logs.map((line) => {
+        return {
+          severity: log.level,
+          jsonPayload: {
+            message: line.message,
+            ...line.meta
+          }
+        }
+      }))
+    }
+
+    if (httpLog) {
+      entries.push({
+        severity: (() => {
+          if (httpLog.response.statusCode < 300) {
+            return "INFO"
+          } else if (httpLog.response.statusCode >= 400 && httpLog.response.statusCode < 500) {
+            return "WARN"
+          } else if (httpLog.response.statusCode >= 500) {
+            return "ERROR"
+          } else {
+            return "DEFAULT"
+          }
+        })(),
+        httpRequest: {
+          requestMethod: log.Event.Request!.Method,
+          requestUrl: log.Event.Request!.URL,
+          status: log.Event.Response?.Status
+        },
+        labels: {
+          rayID: lines[0].meta.rayID
+        },
+      })
+    }
+
+    const res = await fetch(
       "https://logging.googleapis.com/v2/entries:write",
       {
         method: "POST",
@@ -92,7 +127,7 @@ const logger = new WorkerLogger({
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          logName: `projects/${serviceAccount.project_id}/logs/segmentproxyworker`,
+          logName: `projects/${sa.project_id}/logs/your_worker`,
           resource: {
             type: "global", // https://cloud.google.com/logging/docs/api/v2/resource-list
             labels: { // can't put extra labels on global resource...
@@ -100,17 +135,9 @@ const logger = new WorkerLogger({
             },
           },
           labels: {
-            worker: "segmentproxy",
+            worker: "your_worker",
           },
-          entries: lines.map((line) => {
-              return {
-                severity: line.severity,
-                jsonPayload: {
-                  message: line.message,
-                  ...line.meta
-                }
-              }
-            }),
+          entries,
             // dryRun: true
         }),
       }
