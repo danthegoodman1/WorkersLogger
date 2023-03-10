@@ -5,7 +5,7 @@
   },
   "name": "cfworkerslogger",
   "description": "An optimized logger for Cloudflare Workers.",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
