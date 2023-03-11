@@ -7,7 +7,6 @@ Credit to https://hookdeck.com/blog/post/how-to-call-google-cloud-apis-from-clou
 ```ts
 const logger = new WorkerLogger({
   level: "DEBUG",
-  levelKey: "severity",
   withMeta: {
     rayID: request.headers.get("cf-ray")
   },
