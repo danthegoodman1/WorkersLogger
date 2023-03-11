@@ -165,8 +165,7 @@ export async function googleDestinationFunction(lines: LogLine[], env: Env, http
     return {
       severity: line.level,
       labels: {
-        rayID: line.meta?.rayID,
-        test: "hey"
+        rayID: line.meta?.rayID
       },
       jsonPayload: {
         message: line.message,
