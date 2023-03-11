@@ -82,17 +82,15 @@ const logger = new WorkerLogger({
     const token = `${header}.${payload}.${signature}`
 
     const entries: any[] = []
-    for (const log of logLines) {
-      entries.push(...log.Logs.map((line) => {
-        return {
-          severity: log.level,
-          jsonPayload: {
-            message: line.message,
-            ...line.meta
-          }
+    entries.push(...lines.map((line) => {
+      return {
+        severity: line.level,
+        jsonPayload: {
+          message: line.message,
+          ...line.meta
         }
-      }))
-    }
+      }
+    }))
 
     if (httpLog) {
       entries.push({
