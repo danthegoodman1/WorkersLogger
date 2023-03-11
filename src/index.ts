@@ -1,4 +1,4 @@
-import { Request, Response } from "@cloudflare/workers-types"
+import { Headers, Request, Response } from "@cloudflare/workers-types"
 
 export type LogLevel = "DEBUG" | "INFO" | "WARN" | "ERROR"
 const logLevels = ["DEBUG", "INFO", "WARN", "ERROR"]
@@ -83,6 +83,17 @@ export interface HTTPLog {
   }
 }
 
+export interface RequestLike {
+  headers: Headers
+  url: string
+  method: string
+  [x: string | number | symbol]: unknown;
+}
+
+export interface ResponseLike {
+  status: number
+}
+
 export default class WorkerLogger {
   opts?: WorkerLoggerOptions
   logLines: LogLine[] = []
@@ -157,7 +168,7 @@ export default class WorkerLogger {
     this.writeLog("ERROR", message, meta)
   }
 
-  logHTTP(request: Request, response?: Response) {
+  logHTTP(request: RequestLike, response?: ResponseLike) {
     this.httpLog = {
       request: {
         headers: Object.fromEntries(Array.from(request.headers.entries()).map(([key, val]) => {
