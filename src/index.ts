@@ -71,7 +71,7 @@ export interface HTTPLog {
    * For example if you return a Durable Object response you can just use
    * the cf-ray header to associate the log
    */
-  response?: {
+  response: {
     statusCode: number
   }
   request: {
@@ -168,7 +168,7 @@ export default class WorkerLogger {
     this.writeLog("ERROR", message, meta)
   }
 
-  logHTTP(request: RequestLike, response?: ResponseLike) {
+  logHTTP(request: RequestLike, response: ResponseLike) {
     this.httpLog = {
       request: {
         headers: Object.fromEntries(Array.from(request.headers.entries()).map(([key, val]) => {
@@ -180,9 +180,9 @@ export default class WorkerLogger {
         method: request.method,
         url: request.url,
       },
-      response: response ? {
+      response: {
         statusCode: response.status
-      } : undefined
+      }
     }
   }
 
