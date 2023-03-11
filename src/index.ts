@@ -66,7 +66,12 @@ export interface LogLine {
 }
 
 export interface HTTPLog {
-  response: {
+  /**
+   * Optional if you choose not to pass it through.
+   * For example if you return a Durable Object response you can just use
+   * the cf-ray header to associate the log
+   */
+  response?: {
     statusCode: number
   }
   request: {
@@ -152,7 +157,7 @@ export default class WorkerLogger {
     this.writeLog("ERROR", message, meta)
   }
 
-  logHTTP(request: Request, response: Response) {
+  logHTTP(request: Request, response?: Response) {
     this.httpLog = {
       request: {
         headers: Object.fromEntries(Array.from(request.headers.entries()).map(([key, val]) => {
@@ -164,9 +169,9 @@ export default class WorkerLogger {
         method: request.method,
         url: request.url,
       },
-      response: {
+      response: response ? {
         statusCode: response.status
-      }
+      } : undefined
     }
   }
 
