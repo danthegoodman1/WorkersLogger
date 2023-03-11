@@ -215,7 +215,7 @@ export async function googleDestinationFunction(lines: LogLine[], env: Env, http
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        logName: `projects/${serviceAccount.project_id}/logs/your_logname`,
+        logName: `projects/${serviceAccount.project_id}/logs/chaos_goal_coordinator`,
         resource: {
           type: "global", // https://cloud.google.com/logging/docs/api/v2/resource-list
           labels: { // can't put extra labels on global resource...
@@ -223,7 +223,7 @@ export async function googleDestinationFunction(lines: LogLine[], env: Env, http
           },
         },
         labels: {
-          worker: "your_wowrker-Name",
+          worker: "chaosgoalcoordinator",
         },
         entries,
           // dryRun: true
