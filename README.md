@@ -63,7 +63,7 @@ logger.info("this will overwrite", {
 
 ### With Durable Objects
 
-Durable objects will keep running until all promises have settled. So you can do something like:
+Durable objects will keep running until all promises have settled, so keep in mind the response won't be delivered until the logger drains. So you can do something like:
 
 ```ts
 async fetch() {
